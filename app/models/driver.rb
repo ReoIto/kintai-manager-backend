@@ -1,3 +1,16 @@
+# == Schema Information
+#
+# Table name: drivers
+#
+#  id                        :bigint           not null, primary key
+#  deleted_at                :datetime
+#  hourly_pay                :integer          default(0)
+#  minimum_guaranteed_salary :integer          default(0)
+#  name                      :string           not null
+#  uid                       :string
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#
 class Driver < ApplicationRecord
   acts_as_paranoid
 

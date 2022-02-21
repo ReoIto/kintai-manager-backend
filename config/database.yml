@@ -1,0 +1,21 @@
+# PostgreSQL. Versions 9.3 and up are supported.
+
+default: &default
+  adapter: <%= ENV['ADAPTER'] %>
+  encoding: <%= ENV['ENCODING'] %>
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  <<: *default
+  database: <%= ENV['DEV_DATABASE'] %>
+  port: <%= ENV['PORT'] %>
+
+test:
+  <<: *default
+  database: <%= ENV['TEST_DATABASE'] %>
+
+production:
+  <<: *default
+  database: <%= ENV['PROD_DATABASE'] %>
+  username: <%= ENV['PROD_USERNAME'] %>
+  password: <%= ENV["BACKEND_DATABASE_PASSWORD"] %>

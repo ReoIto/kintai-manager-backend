@@ -4,11 +4,11 @@ default: &default
   adapter: <%= ENV['ADAPTER'] %>
   encoding: <%= ENV['ENCODING'] %>
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  port: <%= ENV['DB_PORT'] %>
 
 development:
   <<: *default
   database: <%= ENV['DEV_DATABASE'] %>
-  port: <%= ENV['PORT'] %>
 
 test:
   <<: *default

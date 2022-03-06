@@ -18,5 +18,7 @@ class Driver < ApplicationRecord
   has_many :extra_salaries, dependent: :destroy
 
   validates :name, length: {in: 1..15}, presence: true
-  validates :hourly_pay, length: {maximum: 6}
+  validates :hourly_pay, length: {maximum: 6}, numericality: true
+  validates :minimum_guaranteed_salary, presence: true, length: {maximum: 6},
+    numericality: true
 end

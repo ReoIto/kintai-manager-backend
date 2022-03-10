@@ -75,7 +75,7 @@ class UpdateSpreadSheet
         ValidateInsertingRow.call inserting_row_hash
 
         inserted_sheet =
-          InsertWorkReportToSheet.call work_report.driver, inserting_row_hash, session
+          InsertWorkReportToSheet.call work_report, inserting_row_hash, session
 
         if inserted_sheet.save
           update_sheet_to_ok!(row_num)

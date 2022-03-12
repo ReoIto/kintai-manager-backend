@@ -13,7 +13,6 @@ class UpdateSpreadSheet
   def initialize
     @session = GoogleDrive::Session.from_config(create_config_file)
     @work_report_sheet = session.spreadsheet_by_key(KEY).worksheet_by_title(WRS_NAME)
-    @wrs_rows = work_report_sheet.rows
     @work_report = nil
     @fixed_salary = nil
   end
@@ -25,13 +24,10 @@ class UpdateSpreadSheet
 
     # スプレッドシート1行目はヘッダーのため、2行目からeachを始める
     wrs_rows.each.with_index(2) do |row, i|
-      sleep 2
       ActiveRecord::Base.transaction do
         row_num = i
-        if work_report_sheet[row_num, STATUS_COL_NUM] == OK
-          row_num += 1
-          next
-        end
+        next if work_report_sheet[row_num, STATUS_COL_NUM] == OK
+        next if work_report_sheet[row_num, STATUS_COL_NUM] == ERROR
 
         target_row_hash = {
           name: row[1],
@@ -81,6 +77,9 @@ class UpdateSpreadSheet
           update_sheet_to_ok!(row_num)
           success_result_logger(target_row_hash, work_report)
         end
+        # GoogleAPIの1分間の通信回数の制限を上回ることがあるため
+        # スプレッドシートの更新を行った場合は2秒間sleepさせて遅らせる
+        sleep 2
       end
     rescue StandardError, ActiveRecord::RecordNotFound => e
       Rails.logger.warn e.message
@@ -91,7 +90,7 @@ class UpdateSpreadSheet
   end
 
   private
-  attr_reader :session, :work_report_sheet, :wrs_rows, :work_report, :fixed_salary
+  attr_reader :session, :work_report_sheet, :work_report, :fixed_salary
 
   def create_config_file
     file = File.open(CONFIG_FILE_NAME,"w")

@@ -2,6 +2,8 @@ class UpdateSpreadSheet
   require "google_drive"
 
   include BaseService
+  include ConfigJsonFileCreatable
+  include ConfigJsonFileDeletable
 
   CONFIG_FILE_NAME = ENV['CONFIG_FILE_NAME']
   WRS_NAME = ENV['WORK_REPORT_SHEET_NAME']
@@ -91,28 +93,6 @@ class UpdateSpreadSheet
 
   private
   attr_reader :session, :work_report_sheet, :work_report, :fixed_salary
-
-  def create_config_file
-    file = File.open(CONFIG_FILE_NAME,"w")
-    config_hash = {
-      client_id: ENV['CLIENT_ID'],
-      client_secret: ENV['CLIENT_SECRET'],
-      scope: [
-        ENV['SCOPE_ONE'],
-        ENV['SCOPE_TWO']
-      ],
-      refresh_token: ENV['REFRESH_TOKEN']
-    }
-
-    file.write(config_hash.to_json)
-    file.close
-
-    CONFIG_FILE_NAME
-  end
-
-  def delete_config_file
-    File.delete(CONFIG_FILE_NAME) if File.exist?(CONFIG_FILE_NAME)
-  end
 
   def update_sheet_to_ok! row_num
     work_report_sheet[row_num,STATUS_COL_NUM] = OK

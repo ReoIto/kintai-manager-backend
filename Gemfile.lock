@@ -95,6 +95,9 @@ GEM
     erubi (1.10.0)
     factory_bot (6.2.0)
       activesupport (>= 5.0.0)
+    factory_bot_rails (6.2.0)
+      factory_bot (~> 6.2.0)
+      railties (>= 5.0.0)
     faraday (1.10.0)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
@@ -285,7 +288,7 @@ DEPENDENCIES
   bootsnap
   bullet
   dotenv-rails
-  factory_bot
+  factory_bot_rails
   google_drive
   net-smtp
   paranoia

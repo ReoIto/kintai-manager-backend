@@ -9,5 +9,7 @@ FactoryBot.define do
     departure_time { '09:00:00'.to_time }
     arrival_time { '12:00:00'.to_time }
     formatted_working_time { '03:00:00' }
+
+    association :driver, factory: :driver
   end
 end

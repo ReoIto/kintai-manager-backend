@@ -5,5 +5,7 @@ FactoryBot.define do
     is_base_extra { [true,false].sample }
     is_range_extra { [true,false].sample }
     over_time_minutes { [60,120,180,240].sample }
+
+    association :driver, factory: :driver
   end
 end

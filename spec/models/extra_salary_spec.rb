@@ -24,5 +24,14 @@
 require 'rails_helper'
 
 RSpec.describe ExtraSalary, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  context 'Validations' do
+    let!(:extra_salary) { create :extra_salary }
+    context 'presence' do
+      it 'job_numberがnilだとinvalidであること' do
+        extra_salary.update job_number: nil
+        extra_salary.valid?
+        expect(extra_salary).to_not be_valid
+      end
+    end
+  end
 end

@@ -3,4 +3,7 @@ namespace :spread_sheet do
   task update: :environment do
     UpdateSpreadSheet.call
   end
+  # desc 'Fix and update WorkReport'
+  # task fix: :environment do
+  # end
 end

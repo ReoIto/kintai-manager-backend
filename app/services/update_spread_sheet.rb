@@ -5,7 +5,6 @@ class UpdateSpreadSheet
   include ConfigJsonFileCreatable
   include ConfigJsonFileDeletable
 
-  CONFIG_FILE_NAME = ENV['CONFIG_FILE_NAME']
   WRS_NAME = ENV['WORK_REPORT_SHEET_NAME']
   KEY = ENV['KEY']
   STATUS_COL_NUM = ENV['STATUS_COL_NUM'].to_i

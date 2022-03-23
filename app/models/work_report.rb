@@ -14,7 +14,7 @@
 #  formatted_working_time :string           not null
 #  guests                 :string
 #  job_number             :integer          not null
-#  name                   :integer
+#  name                   :string
 #  one_way_kilo_range     :integer          default(0)
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null

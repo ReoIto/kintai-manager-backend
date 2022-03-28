@@ -6,7 +6,6 @@ class CalcurateSalary
   JOB_3_BASE_SALARY = 4000
   JOB_4_BASE_SALARY_PER_HOUR = 4000
   JOB_5_BASE_SALARY_PER_HOUR = 4000
-  ASANO = '浅野'
 
   def initialize driver, work_report
     @driver = driver
@@ -25,7 +24,7 @@ class CalcurateSalary
     when 2
       JOB_2_BASE_SALARY + base_extra
     when 3
-      if driver.name == ASANO
+      if driver.id == 1
         if working_minutes >= 60
           per_kilo_extra * one_way_kilo_range
         else

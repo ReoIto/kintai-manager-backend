@@ -41,4 +41,17 @@ class WorkReport < ApplicationRecord
   validates :departure_time, presence: true
   validates :arrival_time, presence: true
   validates :job_number, presence: true
+
+  def calc_working_minutes
+    departure_time = self.departure_time
+    arrival_time = self.arrival_time
+
+    # 日を跨いでいる場合の考慮
+    if arrival_time < departure_time
+      arrival_time = arrival_time.tomorrow
+    end
+
+    # 夜勤の場合などはマイナスの値になってしまうため、絶対値を取得する
+    ((arrival_time - departure_time) / 60).abs
+  end
 end

@@ -12,7 +12,7 @@ class CalcurateSalary
     @work_report = work_report
     @base_extra = find_base_extra
     @per_kilo_extra = find_per_kilo_extra
-    @working_minutes = calc_working_minutes
+    @working_minutes = work_report.calc_working_minutes
     @one_way_kilo_range = work_report.one_way_kilo_range
   end
 
@@ -63,19 +63,6 @@ class CalcurateSalary
       is_range_extra: true,
       job_number: work_report.job_number
     )&.amount || 0
-  end
-
-  def calc_working_minutes
-    departure_time = work_report.departure_time
-    arrival_time = work_report.arrival_time
-
-    # 日を跨いでいる場合の考慮
-    if arrival_time < departure_time
-      arrival_time = arrival_time.tomorrow
-    end
-
-    # 夜勤の場合などはマイナスの値になってしまうため、絶対値を取得する
-    ((arrival_time - departure_time) / 60).abs
   end
 
   def find_over_time_extra minutes

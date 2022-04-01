@@ -34,7 +34,8 @@ class CalcurateSalary
         if working_minutes < 60
           JOB_3_BASE_SALARY + base_extra
         else
-          calc_salary_with_over_time_extra
+          over_time_extra = over_time_extra(working_minutes)
+          JOB_3_BASE_SALARY + base_extra + over_time_extra
         end
       end
     when 4, 5
@@ -73,8 +74,8 @@ class CalcurateSalary
     )&.amount || 0
   end
 
-  def calc_salary_with_over_time_extra
-    over_time_extra = case working_minutes
+  def over_time_extra working_minutes
+    case working_minutes
       when 60..119
         find_over_time_extra(60)
       when 120..179
@@ -83,7 +84,6 @@ class CalcurateSalary
         find_over_time_extra(180)
       when 240..999
         find_over_time_extra(240)
-    end
-    JOB_3_BASE_SALARY + base_extra + over_time_extra
+      end
   end
 end

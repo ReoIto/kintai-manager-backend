@@ -1,8 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe CalcurateSalary, type: :service do
-  let(:service){ described_class }
   let!(:driver){ create(:driver) }
+  let(:service){ described_class }
+  subject { service.call driver, work_report }
 
   before do
     stub_const("#{service}::JOB_1_BASE_SALARY", 1000)
@@ -21,8 +22,7 @@ RSpec.describe CalcurateSalary, type: :service do
 
     context 'driverがextra_salaryを持っていない時' do
       it 'JOB_1_BASE_SALARYを返すこと' do
-        total_salary = service.call driver, work_report
-        expect(total_salary).to eq 1000
+        is_expected.to eq 1000
       end
     end
 
@@ -38,8 +38,7 @@ RSpec.describe CalcurateSalary, type: :service do
       end
 
       it 'JOB_1_BASE_SALARYとextra_salaryの合計値を返すこと' do
-        total_salary = service.call driver, work_report
-        expect(total_salary).to eq 1500
+        is_expected.to eq 1500
       end
     end
   end
@@ -51,10 +50,11 @@ RSpec.describe CalcurateSalary, type: :service do
         job_number: 2
     end
 
+    subject { service.call driver, work_report }
+
     context 'driverがextra_salaryを持っていない時' do
       it 'JOB_2_BASE_SALARYを返すこと' do
-        total_salary = service.call driver, work_report
-        expect(total_salary).to eq 1000
+        is_expected.to eq 1000
       end
     end
 
@@ -70,8 +70,7 @@ RSpec.describe CalcurateSalary, type: :service do
       end
 
       it 'JOB_2_BASE_SALARYとextra_salaryの合計値を返すこと' do
-        total_salary = service.call driver, work_report
-        expect(total_salary).to eq 1500
+        is_expected.to eq 1500
       end
     end
   end
@@ -80,7 +79,9 @@ RSpec.describe CalcurateSalary, type: :service do
     let!(:work_report) do
       create :work_report,
         driver_id: driver.id,
-        job_number: 3
+        job_number: 3,
+        departure_time: departure_time,
+        arrival_time: arrival_time
     end
 
     let!(:base_extra) do
@@ -92,112 +93,71 @@ RSpec.describe CalcurateSalary, type: :service do
         is_range_extra: false
     end
 
-    context '実働時間が60未満の時' do
-      it 'JOB_3_BASE_SALARYとbase_extraの合計値を返すこと' do
-        work_report.update!(
-          departure_time: '09:00:00'.to_time,
-          arrival_time: '09:45:00'.to_time
-        )
-        total_salary = service.call driver, work_report
+    context '実働時間が60分未満の時' do
+      let!(:departure_time) { '09:00:00'.to_time }
+      let!(:arrival_time) { '09:45:00'.to_time }
 
-        expect(total_salary).to eq 1500
+      it 'JOB_3_BASE_SALARYとbase_extraの合計値を返すこと' do
+        is_expected.to eq 1500
       end
     end
 
     context '実働時間が60分以上の時(残業代が発生する時)' do
-      context '残業時間が60~119分の時' do
-        let!(:work_report) do
-          create :work_report,
-            driver_id: driver.id,
-            job_number: 3,
-            departure_time: '09:00:00'.to_time,
-            arrival_time: '10:10:00'.to_time
-        end
+      let!(:over_time_extra) do
+        create :extra_salary,
+          driver_id: driver.id,
+          job_number: 3,
+          over_time_minutes: over_time_minutes,
+          amount: amount,
+          is_base_extra: false
+      end
 
-        let!(:over_time_extra) do
-          create :extra_salary,
-            driver_id: driver.id,
-            job_number: 3,
-            over_time_minutes: 60,
-            amount: 1000,
-            is_base_extra: false
-        end
+      context '残業時間が60~119分の時' do
+        let!(:departure_time) { '09:00:00'.to_time }
+        let!(:arrival_time) { '10:10:00'.to_time }
+
+        let!(:over_time_minutes) { 60 }
+        let!(:amount) { 1000 }
 
         it 'JOB_3_BASE_SALARY + base_extra + 残業時間60分のover_time_extraの合計値を返すこと' do
-          total_salary = service.call driver, work_report
-          expect(total_salary).to eq 2500
+          is_expected.to eq 2500
         end
       end
 
       context '残業時間が120~179分の時' do
-        let!(:work_report) do
-          create :work_report,
-            driver_id: driver.id,
-            job_number: 3,
-            departure_time: '09:00:00'.to_time,
-            arrival_time: '11:10:00'.to_time
-        end
+        let!(:departure_time) { '09:00:00'.to_time }
+        let!(:arrival_time) { '11:10:00'.to_time }
 
-        let!(:over_time_extra) do
-          create :extra_salary,
-            driver_id: driver.id,
-            job_number: 3,
-            over_time_minutes: 120,
-            amount: 2000,
-            is_base_extra: false
-        end
+        let!(:over_time_minutes) { 120 }
+        let!(:amount) { 2000 }
 
         it 'JOB_3_BASE_SALARY + base_extra + 残業時間120分のover_time_extraの合計値を返す' do
           total_salary = service.call driver, work_report
-          expect(total_salary).to eq 3500
+          is_expected.to eq 3500
         end
       end
 
       context '残業時間が180~239分の時' do
-        let!(:work_report) do
-          create :work_report,
-            driver_id: driver.id,
-            job_number: 3,
-            departure_time: '09:00:00'.to_time,
-            arrival_time: '12:10:00'.to_time
-        end
+        let!(:departure_time) { '09:00:00'.to_time }
+        let!(:arrival_time) { '12:10:00'.to_time }
 
-        let!(:over_time_extra) do
-          create :extra_salary,
-            driver_id: driver.id,
-            job_number: 3,
-            over_time_minutes: 180,
-            amount: 3000,
-            is_base_extra: false
-        end
+        let!(:over_time_minutes) { 180 }
+        let!(:amount) { 3000 }
 
         it 'JOB_3_BASE_SALARY + base_extra + 残業時間180分のover_time_extraの合計値を返す' do
-          total_salary = service.call driver, work_report
-          expect(total_salary).to eq 4500
+          is_expected.to eq 4500
         end
       end
 
       context '残業時間が240分~の時' do
-        let!(:work_report) do
-          create :work_report,
-            driver_id: driver.id,
-            job_number: 3,
-            departure_time: '09:00:00'.to_time,
-            arrival_time: '13:10:00'.to_time
-        end
+        let!(:departure_time) { '09:00:00'.to_time }
+        let!(:arrival_time) { '13:10:00'.to_time }
 
-        let!(:over_time_extra) do
-          create :extra_salary,
-            driver_id: driver.id,
-            job_number: 3,
-            over_time_minutes: 240,
-            amount: 4000,
-            is_base_extra: false
-        end
+        let!(:over_time_minutes) { 240 }
+        let!(:amount) { 4000 }
 
         it 'JOB_3_BASE_SALARY + base_extra + 残業時間240分のover_time_extraの合計値を返す' do
-          total_salary = service.call driver, work_report
-          expect(total_salary).to eq 5500
+          is_expected.to eq 5500
         end
       end
     end
@@ -205,42 +165,38 @@ RSpec.describe CalcurateSalary, type: :service do
     # 浅野さん
     context 'driver.id == 1' do
       let!(:driver_id_1){ create :driver, id: 1 }
+      let!(:base_extra) do
+        create :extra_salary,
+          job_number: 3,
+          amount: 500,
+          over_time_minutes: 0,
+          is_base_extra: true,
+          is_range_extra: false,
+          driver_id: driver_id_1.id
+      end
+
+      let!(:work_report) do
+        create :work_report,
+          driver_id: driver_id_1.id,
+          job_number: 3,
+          departure_time: departure_time,
+          arrival_time: arrival_time
+      end
+
+      subject { service.call driver_id_1, work_report }
 
       context '実働時間が60分未満の時' do
-        let!(:base_extra) do
-          create :extra_salary,
-            job_number: 3,
-            amount: 500,
-            over_time_minutes: 0,
-            is_base_extra: true,
-            is_range_extra: false,
-            driver_id: driver_id_1.id
-        end
-
-        let!(:work_report) do
-          create :work_report,
-            driver_id: driver_id_1.id,
-            job_number: 3,
-            departure_time: '09:00:00'.to_time,
-            arrival_time: '09:45:00'.to_time
-        end
+        let!(:departure_time) { '09:00:00'.to_time }
+        let!(:arrival_time) { '09:45:00'.to_time }
 
         it 'JOB_3_BASE_SALARYとbase_extraの合計値を返すこと' do
-          total_salary = service.call driver_id_1, work_report
-          expect(total_salary).to eq 1500
+          is_expected.to eq 1500
         end
       end
 
       context '実働時間が60分以上の時' do
-        let!(:work_report) do
-          create :work_report,
-            driver_id: driver_id_1.id,
-            job_number: 3,
-            departure_time: '09:00:00'.to_time,
-            arrival_time: '10:30:00'.to_time,
-            one_way_kilo_range: 50
-        end
-
+        let!(:departure_time) { '09:00:00'.to_time }
+        let!(:arrival_time) { '10:30:00'.to_time }
         let!(:per_kilo_extra) do
           create :extra_salary,
             job_number: 3,
@@ -251,9 +207,12 @@ RSpec.describe CalcurateSalary, type: :service do
             driver_id: driver_id_1.id
         end
 
+        before do
+          work_report.update one_way_kilo_range: 50
+        end
+
         it '走行km x 1km毎の給与の合計値を返すこと' do
-          total_salary = service.call driver_id_1, work_report
-          expect(total_salary).to eq 25000 # 50km * 500yen/1km
+          is_expected.to eq 25000 # 50km * 500yen/1km
         end
       end
     end

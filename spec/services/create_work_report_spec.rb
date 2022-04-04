@@ -17,8 +17,7 @@ RSpec.describe CreateWorkReport, type: :service do
       one_way_kilo_range: 45
     }
   end
-  let!(:service) { described_class }
-  let!(:result) { service.call row }
+  let!(:result) { described_class.call row }
 
   context '正常系' do
     context '渡ってきた値に不備がない時' do

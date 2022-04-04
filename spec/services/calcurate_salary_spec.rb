@@ -247,6 +247,7 @@ RSpec.describe CalcurateSalary, type: :service do
       let(:arrival_time) { '12:00:00'.to_time }
 
       it '1分単位の実働時間に対して時給計算されること' do
+        # 実際に返される値は以下の浮動小数点だがDBには.to_iされた値が入る
         is_expected.to eq 3000.6000000000004
       end
     end

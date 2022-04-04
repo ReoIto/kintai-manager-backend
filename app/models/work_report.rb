@@ -36,6 +36,7 @@ class WorkReport < ApplicationRecord
 
   validates :name, length: {in: 1..15}, presence: true
   validates :code, length: {in: 1..15}, presence: true
+  validates :date, presence: true
   validates :departure_point, presence: true
   validates :destination_point, presence: true
   validates :departure_time, presence: true

@@ -1,12 +1,13 @@
 class CarPriceSearcher
   require 'selenium-webdriver'
+  require 'webdrivers'
   class << self
     def call
       options = Selenium::WebDriver::Chrome::Options.new
       options.binary = ENV.fetch("GOOGLE_CHROME_SHIM")
-      options.add_argument('headless')
-      options.add_argument('disable-gpu')
-      session = Selenium::WebDriver.for :chrome
+      options.add_argument('--headless')
+      options.add_argument('--disable-gpu')
+      session = Selenium::WebDriver.for :chrome, options: options
       # 10秒待っても読み込まれない場合は例外起こす
       session.manage.timeouts.implicit_wait = 10
 

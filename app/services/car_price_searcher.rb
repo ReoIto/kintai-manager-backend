@@ -1,6 +1,5 @@
 class CarPriceSearcher
   require 'selenium-webdriver'
-
   class << self
     def call
       session = Selenium::WebDriver.for :chrome

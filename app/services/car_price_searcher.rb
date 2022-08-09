@@ -1,7 +1,4 @@
 class CarPriceSearcher
-  require 'open-uri'
-  require 'nokogiri'
-  require 'csv'
   require 'selenium-webdriver'
 
   class << self
